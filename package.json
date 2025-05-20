@@ -24,6 +24,12 @@
         "test": "mocha",
         "install": "prebuild-install || node-gyp rebuild"
     },
+    "binary": {
+        "module_name": "pcsclite",
+        "module_path": "./lib/binding/{node_abi}-{platform}-{arch}/",
+        "remote_path": "./releases/",
+        "package_name": "{module_name}-v{version}-{node_abi}-{platform}-{arch}.tar.gz"
+    },
     "repository": "https://github.com/dewe-web/node-pcsclite.git",
     "keywords": [
         "pcsc",

@@ -1,0 +1,45 @@
+name: Build Prebuild for Electron
+
+on:
+  workflow_dispatch:  # omogoča ročni zagon iz GitHub UI
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build:
+    name: Build prebuild binary
+    runs-on: windows-latest
+
+    strategy:
+      matrix:
+        electron_version: ["35.0.3"]
+        arch: ["x64"]
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'  # ali tvoja želena verzija
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Prebuild for Electron
+        run: npx prebuild -r electron -t ${{ matrix.electron_version }} --arch ${{ matrix.arch }} --strip
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: pcsclite-prebuilds
+          path: '*.tar.gz'
+
+      - name: Create GitHub Release and upload prebuild
+        uses: softprops/action-gh-release@v1
+        with:
+          files: '*.tar.gz'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
