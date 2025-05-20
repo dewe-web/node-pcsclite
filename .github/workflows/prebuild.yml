@@ -1,45 +1,56 @@
-name: Build Prebuild for Electron
+name: Build prebuilt binary (Electron ABI 127, Node 22)
 
 on:
-  workflow_dispatch:  # omogoča ročni zagon iz GitHub UI
   push:
     tags:
-      - "v*"
+      - 'v*'
 
 jobs:
-  build:
-    name: Build prebuild binary
+  build-windows:
+    name: Windows x64 Build
     runs-on: windows-latest
 
     strategy:
       matrix:
-        electron_version: ["35.0.3"]
-        arch: ["x64"]
+        arch: [x64]  # lahko dodaš še arm64 če želiš
 
     steps:
-      - name: Checkout repo
+      - name: Checkout source
         uses: actions/checkout@v3
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'  # ali tvoja želena verzija
+          node-version: 22
 
       - name: Install dependencies
-        run: npm install
+        run: |
+          npm install -g node-gyp prebuild
+          npm install
 
-      - name: Prebuild for Electron
-        run: npx prebuild -r electron -t ${{ matrix.electron_version }} --arch ${{ matrix.arch }} --strip
+      - name: Prebuild pcsclite (Electron ABI 127)
+        run: |
+          prebuild -r electron -t 35.0.3 --arch ${{ matrix.arch }} --strip
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
-          name: pcsclite-prebuilds
+          name: pcsclite-electron-v127-${{ matrix.arch }}
           path: '*.tar.gz'
 
-      - name: Create GitHub Release and upload prebuild
-        uses: softprops/action-gh-release@v1
+  release:
+    name: Create GitHub Release
+    needs: build-windows
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v3
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
         with:
-          files: '*.tar.gz'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          files: |
+            pcsclite-electron-v127-x64/*.tar.gz
