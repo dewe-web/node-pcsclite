@@ -37,11 +37,14 @@ jobs:
         run: |
           prebuild -r electron -t 35.0.3 --arch x64 --strip
 
+      - name: List prebuilt output
+        run: dir *.tar.gz || echo "No .tar.gz found"
+
       - name: Upload prebuilt binary
         uses: actions/upload-artifact@v4
         with:
           name: pcsclite-electron-v127-win32-x64
-          path: "*.tar.gz"
+          path: ./prebuilds/*.tar.gz
 
   release:
     name: Publish GitHub Release
