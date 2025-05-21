@@ -24,10 +24,14 @@ jobs:
           npm install -g node-gyp prebuild
           npm ci
 
-      - name: Create folder
+      - name: Prepare binding directory for prebuild
         run: |
-          mkdir -p lib/binding/127-win32-x64
-          copy build\Release\pcsclite.node lib\binding\127-win32-x64\
+          $abi = "v127"
+          $platform = "win32"
+          $arch = "x64"
+          $bindingPath = "lib/binding/$abi-$platform-$arch"
+          mkdir $bindingPath -Force
+          copy build\Release\pcsclite.node "$bindingPath\pcsclite.node"
 
       - name: Prebuild for Electron ABI 127 (Electron 35.0.3)
         run: |
