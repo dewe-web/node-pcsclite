@@ -1,0 +1,55 @@
+name: Prebuild for Windows (Electron ABI 127)
+
+on:
+  push:
+    tags:
+      - 'v*'  # sproži na tagu, npr. v0.1.0
+
+jobs:
+  build-windows:
+    name: Build on Windows x64
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install build tools & dependencies
+        run: |
+          npm install -g node-gyp prebuild
+          npm ci
+
+      - name: Prebuild for Electron ABI 127 (Electron 35.0.3)
+        run: |
+          prebuild -r electron -t 35.0.3 --arch x64 --strip
+
+      - name: Upload prebuilt binary
+        uses: actions/upload-artifact@v3
+        with:
+          name: pcsclite-electron-v127-win32-x64
+          path: "*.tar.gz"
+
+  release:
+    name: Publish GitHub Release
+    needs: build-windows
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: pcsclite-electron-v127-win32-x64
+          path: ./artifacts
+
+      - name: Publish release with binary
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Prebuilt pcsclite for Electron ABI 127
+          files: ./artifacts/*.tar.gz

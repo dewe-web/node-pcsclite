@@ -30,6 +30,11 @@
         "pcsclite",
         "smartcards"
     ],
+    "binary": {
+        "module_name": "pcsclite",
+        "module_path": "lib/binding/{node_abi}-{platform}-{arch}/",
+        "host": "https://github.com/dewe-web/node-pcsclite/releases/download/"
+    },
     "author": "Santiago Gimeno <santiago.gimeno@gmail.com>",
     "license": {
         "type": "ISC",
