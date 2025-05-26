@@ -35,7 +35,7 @@ jobs:
 
       - name: Prebuild for Electron ABI 127 (Electron 35.0.3)
         run: |
-          prebuild -r electron -t 35.0.3 --arch x64 --strip
+          prebuild -r electron -t 35.0.3 --arch x64 --platform win32 --strip
 
       - name: List prebuilt output
         run: dir *.tar.gz || echo "No .tar.gz found"
