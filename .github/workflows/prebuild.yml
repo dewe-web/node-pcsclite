@@ -33,9 +33,9 @@ jobs:
           mkdir $bindingPath -Force
           copy build\Release\pcsclite.node "$bindingPath\pcsclite.node"
 
-      - name: Prebuild for Electron ABI 133 (Electron 30)
+      - name: Prebuild for Electron ABI 133 (Electron 30.5.1)
         run: |
-          prebuild -r electron -t 30 --arch x64 --platform win32 --strip
+          prebuild -r electron -t 30.5.1 --arch x64 --platform win32 --strip
 
       - name: List prebuilt output
         run: dir ./prebuilds/*.tar.gz || echo "No .tar.gz found"
