@@ -1,4 +1,4 @@
-name: Prebuild for Windows (Electron ABI 127)
+name: Prebuild for Windows (Electron ABI 133)
 
 on:
   push:
@@ -26,24 +26,24 @@ jobs:
 
       - name: Prepare binding directory for prebuild
         run: |
-          $abi = "v127"
+          $abi = "v133"
           $platform = "win32"
           $arch = "x64"
           $bindingPath = "lib/binding/$abi-$platform-$arch"
           mkdir $bindingPath -Force
           copy build\Release\pcsclite.node "$bindingPath\pcsclite.node"
 
-      - name: Prebuild for Electron ABI 127 (Electron 35.0.3)
+      - name: Prebuild for Electron ABI 133 (Electron 30)
         run: |
-          prebuild -r electron -t 35.0.3 --arch x64 --platform win32 --strip
+          prebuild -r electron -t 30 --arch x64 --platform win32 --strip
 
       - name: List prebuilt output
-        run: dir *.tar.gz || echo "No .tar.gz found"
+        run: dir ./prebuilds/*.tar.gz || echo "No .tar.gz found"
 
       - name: Upload prebuilt binary
         uses: actions/upload-artifact@v4
         with:
-          name: pcsclite-electron-v127-win32-x64
+          name: pcsclite-electron-v133-win32-x64
           path: ./prebuilds/*.tar.gz
 
   release:
@@ -56,12 +56,12 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
-          name: pcsclite-electron-v127-win32-x64
+          name: pcsclite-electron-v133-win32-x64
           path: ./artifacts
 
       - name: Publish release with binary
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
-          name: Prebuilt pcsclite for Electron ABI 127
+          name: Prebuilt pcsclite for Electron ABI 133
           files: ./artifacts/*.tar.gz
